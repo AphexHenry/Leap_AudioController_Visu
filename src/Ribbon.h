@@ -56,6 +56,8 @@ public:
 	
 	const ci::Colorf&		getColor() const;
 	int32_t					getId() const;
+    
+    void                    setOn(bool aOn);
 private:
 	struct Point
 	{
@@ -65,6 +67,7 @@ private:
 		float				mWidth;
 	};
 
+    bool                    mIsOn;
 	ci::Colorf				mColor;
 	int32_t					mId;
 	std::vector<Point>		mPoints;

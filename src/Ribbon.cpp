@@ -56,10 +56,12 @@ Ribbon::Ribbon( int32_t id, const Colorf& color )
 {
     mColor	= color;
     mId		= id;
+    mIsOn   = false;
 }
 
 Ribbon::~Ribbon()
 {
+    setOn(false);
     mPoints.clear();
 }
 
@@ -116,9 +118,17 @@ void Ribbon::draw() const
 void Ribbon::updateOSC()
 {
     if(mPositions.size()) {
-        int note = 60 + mPositions[mPositions.size() - 1].y;
-        OSCManager::getInstance()->SendOSC("/" + mId, note);
-        std::cout << note << std::endl;
+        int x = mPositions[mPositions.size() - 1].y / 10;
+        int y = mPositions[mPositions.size() - 1].y / 10;
+        OSCManager::getInstance()->SendProgram(mId, x, y);
+    }
+}
+
+void Ribbon::setOn(bool aIsOn)
+{
+    if(mIsOn != aIsOn) {
+        mIsOn = aIsOn;
+        OSCManager::getInstance()->SendNote(mId, mIsOn ? 1 : 0);
     }
 }
 

@@ -23,7 +23,8 @@ public:
 	void setup();
 	void SendOSC(std::string aAdress, float aValue);
 	void SendOSC(std::string aAdress, int aValue);
-    void SendNote(int aId, int aPitch, int aValue);
+    void SendNote(int aId, int aValue);
+    void SendProgram(int aId, int aX, int aY);
 	void update();
 	void Listen();
     void GetValueForAdress(std::string aMessage, float &aValue);

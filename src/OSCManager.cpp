@@ -194,14 +194,32 @@ bool OSCManager::IsAdressInContainer(string aAdress)
     return it!=mMessageContainer.end();
 }
 
-void OSCManager::SendNote(int aId, int aX, int aY)
+void OSCManager::SendProgram(int aId, int aX, int aY)
 {
 	osc::Message message;
+    message.addIntArg(aId);
 	message.addIntArg(aX);
     message.addIntArg(aY);
-	message.setAddress("/" + to_string(aId));
+	message.setAddress("/controls");
 	message.setRemoteEndpoint(host, port);
 	sender.sendMessage(message);
+}
+
+void OSCManager::SendNote(int aId, int aValue)
+{
+    osc::Message message;
+    message.addIntArg(aId);
+    if(aValue) {
+        message.addIntArg(127);
+        message.setAddress("/note");
+    }
+    else {
+        message.addIntArg(0);
+        message.setAddress("/note");
+    }
+    
+    message.setRemoteEndpoint(host, port);
+    sender.sendMessage(message);
 }
 
 void OSCManager::SendOSC(string aAdress, int aValue)

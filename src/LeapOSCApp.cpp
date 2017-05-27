@@ -220,25 +220,55 @@ void LeapOSCApp::update()
 		const Leap::Hand& hand = *handIter;
 		
 		const Leap::FingerList& fingers = hand.fingers();
+        
+        std::vector<int32_t> lRibbonsOff;
+        RibbonMap::iterator lIt;
+        for(lIt = mRibbons.begin(); lIt != mRibbons.end(); lIt++) {
+            lRibbonsOff.push_back(lIt->first);
+        }
+        
 		for ( Leap::FingerList::const_iterator iter = fingers.begin(); iter != fingers.end(); ++iter ) {
 			const Leap::Finger& finger = *iter;
 			if ( finger.isExtended() ) {
 				int32_t id = finger.id();
+                
+                for(int i = 0; i < lRibbonsOff.size(); i++) {
+                    if(lRibbonsOff[i] == id) {
+                        lRibbonsOff.erase(lRibbonsOff.begin() + i);
+                    }
+                }
+                
 				if ( mRibbons.find( id ) == mRibbons.end() ) {
 					vec3 v = randVec3();
 					v.x = math<float>::abs( v.x );
 					v.y = math<float>::abs( v.y );
 					v.z = math<float>::abs( v.z );
 					Colorf color( ColorModel::CM_RGB, v );
-					Ribbon ribbon( id, color );
+					Ribbon ribbon( mRibbons.size(), color );
 					mRibbons[ id ] = ribbon;
 				}
 				float width = math<float>::abs( finger.tipVelocity().y ) * 0.00075f;
 				width		= math<float>::max( width, 2.0f );
 				mRibbons.at( id ).addPoint( LeapMotion::toVec3( finger.tipPosition() ), width );
+                mRibbons.at( id ).setOn(true);
 			}
 		}
+        
+        for(int i = 0; i < lRibbonsOff.size(); i++) {
+            mRibbons.at(lRibbonsOff[i]).setOn(false);
+        }
+        
+        if(mRibbons.size() > 5) {
+            mRibbons.erase(mRibbons.begin());
+        }
+        
 	}
+    
+    if(hands.isEmpty()) {
+        for ( RibbonMap::iterator iter = mRibbons.begin(); iter != mRibbons.end(); ++iter ) {
+            iter->second.setOn(false);
+        }
+    }
 
 	// Update ribbons
     console() << mRibbons.size() << std::endl;
