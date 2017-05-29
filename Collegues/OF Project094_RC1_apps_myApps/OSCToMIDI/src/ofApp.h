@@ -3,6 +3,9 @@
 #include "ofMain.h"
 #include "ofxMidi.h"
 #include "ofxOSC.h"
+#include "ofxGUI.h"
+
+#define FINGER_COUNT 5
 
 class ofApp : public ofBaseApp{
 
@@ -22,9 +25,22 @@ class ofApp : public ofBaseApp{
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
+
+        void checkToggles();
+        void sendNote(int indexControl, int aValue, int aAddNote = 0);
+    
+        void sendControlChange(int indexControl, int aValue, bool isX);
+        int getControlIndex(int aIndexFinger) {return aIndexFinger + 1;};
+    
+        int mLastNote[FINGER_COUNT];
 private:
     ofxOscReceiver  mOSCReceiver;
-    ofxMidiOut  midiOut;
+    ofxMidiOut      midiOut;
+    ofxPanel        mGui;
+    ofxToggle       mProgXButton[FINGER_COUNT];
+    ofxToggle       mProgYButton[FINGER_COUNT];
+    ofxToggle       mNoteButton[FINGER_COUNT];
+    
     std::vector<int> mScale;
 		
 };

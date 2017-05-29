@@ -26,15 +26,64 @@ void ofApp::setup(){
     mScale.push_back(32 + 24);
     mScale.push_back(37 + 24);
     mScale.push_back(39 + 24);
+    
+    mGui.setup();
+    ofxLabel * lXLabel = new ofxLabel();
+    *lXLabel = std::string("");
+    mGui.add(lXLabel);
+    for(int i = 0; i < FINGER_COUNT; i++)
+    {
+//        mProgXButton[i].addListener(this, &ofApp::progXSend);
+        mGui.add(mProgXButton[i].setup("prog X " + to_string(i), false));
+    }
+    
+    ofxLabel * lYLabel = new ofxLabel();
+    *lYLabel = std::string("");
+    mGui.add(lYLabel);
+    
+    for(int i = 0; i < FINGER_COUNT; i++)
+    {
+        mGui.add(mProgYButton[i].setup("prog Y " + to_string(i), false));
+    }
+    
+    for(int i = 0; i < FINGER_COUNT; i++)
+    {
+        mGui.add(mNoteButton[i].setup("note " + to_string(i), false));
+    }
+}
+
+void ofApp::checkToggles()
+{
+    for(int i = 0; i < FINGER_COUNT; i++)
+    {
+        if(mProgXButton[i] == true) {
+            mProgXButton[i] = false;
+            sendControlChange(i, 50, true);
+        }
+    }
+    
+    for(int i = 0; i < FINGER_COUNT; i++)
+    {
+        if(mProgYButton[i] == true) {
+            mProgYButton[i] = false;
+            sendControlChange(i, 50, false);
+        }
+    }
+    
+    for(int i = 0; i < FINGER_COUNT; i++)
+    {
+        if(mNoteButton[i] == true) {
+            mNoteButton[i] = false;
+            sendNote(i, 50);
+        }
+    }
 }
 
 //--------------------------------------------------------------
 void ofApp::update(){
-    int channel = 1;
+    
     int note = 0;
     int velocity = 0;
-    
-    
     
     // check for waiting messages
     while(mOSCReceiver.hasWaitingMessages()){
@@ -45,36 +94,52 @@ void ofApp::update(){
         // check for mouse moved message
         std::string lAdress = m.getAddress();
         
-        int note = m.getArgAsInt32(0) % 12;
+        note = m.getArgAsInt(0) % 5;
+        int channel = getControlIndex(note);
         
         if(m.getAddress() == "/note")
         {
             velocity = m.getArgAsInt32(1);
-            note = mScale[note] + 24;
-            midiOut.sendNoteOn(channel, note,  velocity);
-            std::cout << note << " " << velocity << std::endl;
+            sendNote(note, velocity);
         }
         else if(m.getAddress() == "/controls")
         {
             int lX = m.getArgAsInt32(1);
             int lY = m.getArgAsInt32(1);
-            midiOut.sendControlChange(channel, note * 2, lX);
-            midiOut.sendControlChange(channel, note * 2 + 1, lY);
+            int lNewNote = lY /5;
+//            sendNote(note, 127, lNewNote);
+            sendControlChange(note, lX, true);
+            sendControlChange(note, lY, false);
         }
     }
     
+    checkToggles();
 }
 
+void ofApp::sendControlChange(int indexControl, int aValue, bool isX) {
+    int channel = 1;//getControlIndex(indexControl);
+    indexControl = isX ? indexControl * 2 : indexControl * 2 + 1;
+    midiOut.sendControlChange(channel, indexControl, aValue);
+}
+
+void ofApp::sendNote(int indexControl, int aValue, int aAddNote) {
+
+    int channel = getControlIndex(indexControl);
+    int lIndexNote = min(indexControl + aAddNote, (int)mScale.size() - 1);
+//    if(lIndexNote != mLastNote[indexControl] || !aValue) {
+//        mLastNote[indexControl] = lIndexNote;
+//        int note = mScale[lIndexNote] + 24;
+//        midiOut.sendNoteOn(channel, note,  aValue);
+//    }
+    int note = mScale[lIndexNote] + 24;
+    midiOut.sendNoteOn(channel, note,  aValue);
+}
 
 //--------------------------------------------------------------
 void ofApp::draw(){
     // let's see something
     ofSetColor(0);
-    stringstream text;
-    text << "connected to port " << midiOut.getPort()
-    << " \"" << midiOut.getName() << "\"" << endl
-    << "is virtual?: " << midiOut.isVirtual() << endl << endl;
-    ofDrawBitmapString(text.str(), 20, 20);
+    mGui.draw();
 }
 
 //--------------------------------------------------------------

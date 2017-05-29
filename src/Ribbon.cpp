@@ -118,8 +118,8 @@ void Ribbon::draw() const
 void Ribbon::updateOSC()
 {
     if(mPositions.size()) {
-        int x = mPositions[mPositions.size() - 1].y / 10;
-        int y = mPositions[mPositions.size() - 1].y / 10;
+        int x = mPositions[mPositions.size() - 1].y / 5;
+        int y = mPositions[mPositions.size() - 1].y / 5;
         OSCManager::getInstance()->SendProgram(mId, x, y);
     }
 }
