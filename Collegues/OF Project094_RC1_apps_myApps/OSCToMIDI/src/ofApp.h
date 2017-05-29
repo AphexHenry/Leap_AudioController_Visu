@@ -37,6 +37,7 @@ private:
     ofxOscReceiver  mOSCReceiver;
     ofxMidiOut      midiOut;
     ofxPanel        mGui;
+    ofxSlider<int>  mPitchMod;
     ofxToggle       mProgXButton[FINGER_COUNT];
     ofxToggle       mProgYButton[FINGER_COUNT];
     ofxToggle       mNoteButton[FINGER_COUNT];

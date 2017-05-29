@@ -259,7 +259,12 @@ void LeapOSCApp::update()
         }
         
         if(mRibbons.size() > 5) {
+            int i = 0;
+            for ( RibbonMap::iterator iter = mRibbons.begin(); iter != mRibbons.end(); ++iter ) {
+                iter->second.setId(i++);
+            }
             mRibbons.erase(mRibbons.begin());
+            
         }
         
 	}
@@ -271,7 +276,6 @@ void LeapOSCApp::update()
     }
 
 	// Update ribbons
-    console() << mRibbons.size() << std::endl;
 	for ( RibbonMap::iterator iter = mRibbons.begin(); iter != mRibbons.end(); ++iter ) {
 		iter->second.update();
 	}

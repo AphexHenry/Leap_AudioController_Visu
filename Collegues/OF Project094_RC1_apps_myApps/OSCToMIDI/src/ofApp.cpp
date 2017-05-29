@@ -26,6 +26,8 @@ void ofApp::setup(){
     mScale.push_back(32 + 24);
     mScale.push_back(37 + 24);
     mScale.push_back(39 + 24);
+    mScale.push_back(41 + 24);
+    mScale.push_back(42 + 24);
     
     mGui.setup();
     ofxLabel * lXLabel = new ofxLabel();
@@ -50,6 +52,7 @@ void ofApp::setup(){
     {
         mGui.add(mNoteButton[i].setup("note " + to_string(i), false));
     }
+    mGui.add(mPitchMod.setup("pitch", 0, -50, 50));
 }
 
 void ofApp::checkToggles()
@@ -106,10 +109,10 @@ void ofApp::update(){
         {
             int lX = m.getArgAsInt32(1);
             int lY = m.getArgAsInt32(1);
-            int lNewNote = lY /5;
-//            sendNote(note, 127, lNewNote);
+            int lNewNote = lY /8;
+            sendNote(note, 127, lNewNote);
             sendControlChange(note, lX, true);
-            sendControlChange(note, lY, false);
+//            sendControlChange(note, lY, false);
         }
     }
     
@@ -126,13 +129,18 @@ void ofApp::sendNote(int indexControl, int aValue, int aAddNote) {
 
     int channel = getControlIndex(indexControl);
     int lIndexNote = min(indexControl + aAddNote, (int)mScale.size() - 1);
-//    if(lIndexNote != mLastNote[indexControl] || !aValue) {
-//        mLastNote[indexControl] = lIndexNote;
-//        int note = mScale[lIndexNote] + 24;
-//        midiOut.sendNoteOn(channel, note,  aValue);
-//    }
-    int note = mScale[lIndexNote] + 24;
-    midiOut.sendNoteOn(channel, note,  aValue);
+    if(abs(lIndexNote - mLastNote[indexControl]) >= 2 || !aValue) {
+        mLastNote[indexControl] = lIndexNote;
+        // previous note off.
+        int noteOff = mScale[mLastNote[indexControl]] + 12 * indexControl + mPitchMod;
+        midiOut.sendNoteOff(channel, noteOff,  0);
+        
+        int note = mScale[lIndexNote] + 12 * indexControl + mPitchMod;
+        std::cout << "note on. channel " << channel << " note " << note << " value " << aValue << std::endl;
+        midiOut.sendNoteOn(channel, note,  aValue);
+    }
+//    int note = mScale[lIndexNote] + 24;
+//    midiOut.sendNoteOn(channel, note,  aValue);
 }
 
 //--------------------------------------------------------------

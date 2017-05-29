@@ -58,6 +58,7 @@ public:
 	int32_t					getId() const;
     
     void                    setOn(bool aOn);
+    void                    setId(int aId) {mId = aId;};
 private:
 	struct Point
 	{
