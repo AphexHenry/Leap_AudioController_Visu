@@ -49,6 +49,7 @@ public:
 	void						draw() override;
 	void						resize() override;
 	void						update() override;
+    void                        keyDown( ci::app::KeyEvent event ) override;
 private:
 	RibbonMap					mRibbons;
 
@@ -179,7 +180,7 @@ void LeapOSCApp::draw()
 		gl::draw( mFbo[ 2 ]->getColorTexture(), getWindowBounds() );
 	}
 
-	mParams->draw();
+//	mParams->draw();
 }
 
 void LeapOSCApp::screenShot()
@@ -279,6 +280,12 @@ void LeapOSCApp::update()
 	for ( RibbonMap::iterator iter = mRibbons.begin(); iter != mRibbons.end(); ++iter ) {
 		iter->second.update();
 	}
+}
+
+void LeapOSCApp::keyDown( KeyEvent event ) {
+    if(event.getChar() == 'f') {
+        mFullScreen = !mFullScreen;
+    }
 }
 
 RendererGl::Options gOptions;

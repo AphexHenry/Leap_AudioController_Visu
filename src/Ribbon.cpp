@@ -67,9 +67,10 @@ Ribbon::~Ribbon()
 
 void Ribbon::addPoint( const vec3& position, float width )
 {
-    vec3 p( position );
+    
+    vec3 p( position.x, position.y + 50, position.z );
     if ( !mPoints.empty() ) {
-        p = glm::mix( mPoints.back().mPosition, position, vec3( 0.15f ) );
+        p = glm::mix( mPoints.back().mPosition, p, vec3( 0.15f ) );
     }
     
     Point point( p, width );
@@ -137,8 +138,8 @@ void Ribbon::update()
     float e = getElapsedSeconds() * 40.0f;
     float i = 0.0f;
     for ( vector<Point>::iterator iter = mPoints.begin(); iter != mPoints.end(); i += 1.0f ) {
-        iter->mAlpha		-= 0.01f;
-        iter->mWidth		-= 0.125f;
+        iter->mAlpha		-= 0.008f;
+        iter->mWidth		-= 0.065f;
         float t				= powf( i, 2.0f ) + e;
         iter->mPosition.x	+= cosf( t ) * 0.3f;
         iter->mPosition.y	+= sinf( t ) * 0.5f;

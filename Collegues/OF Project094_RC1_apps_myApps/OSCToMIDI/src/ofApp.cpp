@@ -109,10 +109,10 @@ void ofApp::update(){
         {
             int lX = m.getArgAsInt32(1);
             int lY = m.getArgAsInt32(1);
-            int lNewNote = lY /8;
+            int lNewNote = lY / 5.f - 5;
             sendNote(note, 127, lNewNote);
             sendControlChange(note, lX, true);
-//            sendControlChange(note, lY, false);
+            sendControlChange(note, lY, false);
         }
     }
     
@@ -128,7 +128,7 @@ void ofApp::sendControlChange(int indexControl, int aValue, bool isX) {
 void ofApp::sendNote(int indexControl, int aValue, int aAddNote) {
 
     int channel = getControlIndex(indexControl);
-    int lIndexNote = min(indexControl + aAddNote, (int)mScale.size() - 1);
+    int lIndexNote = max(min(indexControl + aAddNote, (int)mScale.size() - 1), 0);
     if(abs(lIndexNote - mLastNote[indexControl]) >= 2 || !aValue) {
         mLastNote[indexControl] = lIndexNote;
         // previous note off.
